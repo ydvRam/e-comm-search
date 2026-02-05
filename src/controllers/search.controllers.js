@@ -67,8 +67,18 @@ exports.searchProducts = async (req, res) => {
       })
       .sort((a, b) => b.score - a.score);
 
+    const data = withScores.map((x) => {
+      const doc = x.product.toObject ? x.product.toObject() : { ...x.product };
+      delete doc.score;
+      return {
+        ...doc,
+        rankScore: x.score,
+        scoreBreakdown: x.scoreBreakdown
+      };
+    });
+
     res.json({
-      data: withScores.map((x) => x.product),
+      data,
       rankedByScore: withScores.map((x) => ({
         productId: x.product._id,
         title: x.product.title,
