@@ -1,7 +1,11 @@
 const Product = require("../models/product");
 const { calculateScore } = require("../utils/scoring");
-const { isSimilar } = require("../utils/typoHandler");
+const { getCanonicalKeyword } = require("../utils/typoHandler");
 const { extractPriceLimit } = require("../utils/queryParser");
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 exports.searchProducts = async (req, res) => {
   try {
@@ -18,20 +22,44 @@ exports.searchProducts = async (req, res) => {
 
     const priceLimit = extractPriceLimit(rawQuery);
 
-    const words = rawQuery.split(" ");
-    const keyword =
-      words.find(w => isSimilar(w, "iphone")) || words[0];
+    const words = rawQuery.split(" ").filter(Boolean);
+    const firstWord = words[0] || rawQuery;
+    // Correct typos using known terms (e.g. ipone -> iphone, samsng -> samsung)
+    const keyword = getCanonicalKeyword(firstWord);
 
     let mongoQuery = { $text: { $search: keyword } };
-
     if (priceLimit) {
       mongoQuery.price = { $lte: priceLimit };
     }
 
-    const products = await Product.find(
-      mongoQuery,
-      { score: { $meta: "textScore" } }
-    );
+    let products = [];
+    try {
+      products = await Product.find(
+        mongoQuery,
+        { score: { $meta: "textScore" } }
+      );
+    } catch (_) {
+      // Text index may not exist
+    }
+
+    // Fallback: if text search returns nothing (typo or no text index), search by regex
+    if (products.length === 0) {
+      const safeKeyword = escapeRegex(keyword);
+      const regex = new RegExp(safeKeyword, "i");
+      const fallbackQuery = {
+        $or: [
+          { title: regex },
+          { description: regex },
+          { "metadata.model": regex },
+          { "metadata.storage": regex },
+          { "metadata.color": regex }
+        ]
+      };
+      if (priceLimit) {
+        fallbackQuery.price = { $lte: priceLimit };
+      }
+      products = await Product.find(fallbackQuery);
+    }
 
     const ranked = products
       .map(p => ({

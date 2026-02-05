@@ -9,13 +9,32 @@ exports.createProduct = async (req, res) => {
   }
 };
 
+exports.getMetadata = async (req, res) => {
+  try {
+    const productId = req.query.productId || req.body?.productId;
+    if (!productId) {
+      return res.status(400).json({
+        message: "productId is required (query: ?productId=...)"
+      });
+    }
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    return res.json({ productId: product._id, metadata: product.metadata || {} });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 exports.updateMetadata = async (req, res) => {
   try {
-    const { productId, metadata } = req.body;
+    const productId = req.body.productId || req.query.productId;
+    const metadata = req.body.metadata;
 
-    if (!productId || !metadata) {
+    if (!productId || !metadata || typeof metadata !== "object") {
       return res.status(400).json({
-        message: "productId and metadata are required"
+        message: "productId and metadata are required. Use JSON body: { \"productId\": \"<id>\", \"metadata\": { ... } } or query ?productId=<id> with body { \"metadata\": { ... } }"
       });
     }
 
