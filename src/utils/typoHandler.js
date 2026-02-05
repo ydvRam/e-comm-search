@@ -6,10 +6,12 @@ const KNOWN_TERMS = [
   "electronics", "tablet", "watch", "headphone", "camera"
 ];
 
-exports.isSimilar = (a, b) => {
+function isSimilar(a, b) {
   if (!a || !b) return false;
   return levenshtein.get(String(a).toLowerCase(), String(b).toLowerCase()) <= 2;
-};
+}
+
+exports.isSimilar = isSimilar;
 
 /** Return canonical term if word is a typo of a known term, else return word as-is */
 exports.getCanonicalKeyword = (word) => {

@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
     message: "E-commerce Search API",
     docs: "Use /api/v1 for API calls",
     search: "GET /api/v1/search/product?query=iphone",
-    metadata: "GET /api/v1/product/meta-data?productId=<id>"
+    metadata: "GET /api/v1/product/meta-data?productId=<your-product-id>"
   });
 });
 
