@@ -12,7 +12,11 @@ async function seed() {
 
     console.log(`📦 Inserting ${products.length} products`);
 
-    await Product.insertMany(products);
+    const withSales = products.map((p) => ({
+      ...p,
+      unitsSold: p.unitsSold ?? Math.floor(50 + Math.random() * 950)
+    }));
+    await Product.insertMany(withSales);
 
     console.log("✅ Database seeded successfully");
     process.exit();

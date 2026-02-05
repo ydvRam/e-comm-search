@@ -46,5 +46,3 @@ Base URL: `http://localhost:3000/api/v1`
 ```bash
 node src/script/seedDB.js
 ```
-
-Ensure `MONGODB_URI` is set (in `.env` or env) if not using local MongoDB.

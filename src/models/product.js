@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema(
     price: Number,
     mrp: Number,
     currency: String,
+    unitsSold: { type: Number, default: 0 },
     metadata: {
       type: Object,
       default: {}
