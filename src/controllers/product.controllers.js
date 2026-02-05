@@ -1,4 +1,10 @@
-const Product = require("..//models/product");
+const mongoose = require("mongoose");
+const Product = require("../models/product");
+
+function isValidObjectId(id) {
+  if (!id || typeof id !== "string") return false;
+  return /^[a-fA-F0-9]{24}$/.test(id) && mongoose.Types.ObjectId.isValid(id);
+}
 
 exports.createProduct = async (req, res) => {
   try {
@@ -15,6 +21,11 @@ exports.getMetadata = async (req, res) => {
     if (!productId) {
       return res.status(400).json({
         message: "productId is required (query: ?productId=...)"
+      });
+    }
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({
+        message: "Invalid productId. Use a real product ID from your database (24-character hex string). Example: GET /api/v1/product/meta-data?productId=507f1f77bcf86cd799439011"
       });
     }
     const product = await Product.findById(productId);
@@ -35,6 +46,11 @@ exports.updateMetadata = async (req, res) => {
     if (!productId || !metadata || typeof metadata !== "object") {
       return res.status(400).json({
         message: "productId and metadata are required. Use JSON body: { \"productId\": \"<id>\", \"metadata\": { ... } } or query ?productId=<id> with body { \"metadata\": { ... } }"
+      });
+    }
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({
+        message: "Invalid productId. Use a real product ID from your database (24-character hex string)."
       });
     }
 

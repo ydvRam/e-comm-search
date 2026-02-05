@@ -74,6 +74,10 @@ exports.searchProducts = async (req, res) => {
 
     res.json({ data: ranked });
   } catch (err) {
-    res.status(500).json({ error: "Search failed" });
+    console.error("Search error:", err);
+    res.status(500).json({
+      error: "Search failed",
+      detail: err.message
+    });
   }
 };
