@@ -11,8 +11,12 @@ app.get("/", (req, res) => {
   res.json({
     message: "E-commerce Search API",
     docs: "Use /api/v1 for API calls",
-    search: "GET /api/v1/search/product?query=iphone",
-    metadata: "GET /api/v1/product/meta-data?productId=<your-product-id>"
+    endpoints: {
+      search: "GET /api/v1/search/product?query=iphone",
+      listProducts: "GET /api/v1/product (returns products with _id — copy one for metadata)",
+      getMetadata: "GET /api/v1/product/meta-data?productId=<paste-_id-here>",
+      updateMetadata: "PUT /api/v1/product/meta-data (body: productId, metadata)"
+    }
   });
 });
 

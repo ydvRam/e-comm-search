@@ -6,6 +6,24 @@ function isValidObjectId(id) {
   return /^[a-fA-F0-9]{24}$/.test(id) && mongoose.Types.ObjectId.isValid(id);
 }
 
+/** List a few products so you can copy _id for metadata API */
+exports.listProducts = async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 5, 20);
+    const products = await Product.find()
+      .select("_id title price")
+      .limit(limit)
+      .lean();
+    return res.json({
+      message: "Copy an _id from below to use in the metadata URL",
+      count: products.length,
+      data: products
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 exports.createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);

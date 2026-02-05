@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Product = require("../models/product");
 const products = require("../data/products.json"); 
 
-mongoose.connect("mongodb://127.0.0.1:27017/ecommerce-search");
+mongoose.connect("mongodb+srv://ramyadav8395_db_user:Yadav%407457@cluster0.rrsmvam.mongodb.net/?appName=Cluster0");
 
 async function seed() {
   try {

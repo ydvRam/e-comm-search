@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+  listProducts,
   createProduct,
   getMetadata,
   updateMetadata
@@ -7,6 +8,7 @@ const {
 
 const router = express.Router();
 
+router.get("/", listProducts);
 router.post("/", createProduct);
 router.get("/meta-data", getMetadata);
 router.put("/meta-data", updateMetadata);
